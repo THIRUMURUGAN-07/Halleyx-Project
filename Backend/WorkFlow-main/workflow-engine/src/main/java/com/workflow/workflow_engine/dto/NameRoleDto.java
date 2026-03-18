@@ -12,4 +12,6 @@ public class NameRoleDto {
 	private String name;
 	
 	private String role;
+
+	private String token;
 }

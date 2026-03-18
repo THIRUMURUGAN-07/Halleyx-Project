@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/steps")
+@RequestMapping("/rules")
 @RequiredArgsConstructor
 public class RuleController {
 
     private final RuleService ruleService;
 
-    @PostMapping("/{stepId}/rules")
+    @PostMapping("/{stepId}/rule")
     public Rule addRule(
             @PathVariable String stepId,
             @RequestBody CreateRuleRequest request){
@@ -24,7 +24,7 @@ public class RuleController {
         return ruleService.addRule(stepId, request);
     }
 
-    @GetMapping("/{stepId}/rules")
+    @GetMapping("/{stepId}/rule")
     public List<Rule> getRules(@PathVariable String stepId){
 
         return ruleService.getRules(stepId);

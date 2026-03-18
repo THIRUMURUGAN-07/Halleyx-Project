@@ -11,9 +11,6 @@ const Register = () => {
   const [password,setPassword] = useState("");
   const [role,setRole] = useState("USER");
 
-  const [otp,setOtp] = useState("");
-  const [showOtp,setShowOtp] = useState(false);
-
   const register = async () => {
 
     await axios.post(
@@ -21,97 +18,71 @@ const Register = () => {
       {name,email,password,role}
     );
 
-    setShowOtp(true);
-  };
-
-  const verifyOtp = async () => {
-
-    await axios.post(
-      `http://localhost:8080/auth/verify-otp`,
-      {email,otp}
-    );
-
-    localStorage.setItem("name",name);
-    localStorage.setItem("role",role);
-
-    navigate("/dashboard");
+    alert("OTP sent to your email");
   };
 
   return (
 
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <div className="flex items-center justify-center h-screen bg-gradient-to-r from-green-400 to-blue-500">
 
-      <div className="bg-white p-6 rounded shadow w-96">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-96">
 
-        <h2 className="text-xl font-bold mb-4">Register</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">
+          Register
+        </h2>
 
         <input
-          className="border p-2 w-full mb-3"
+          className="border p-2 w-full mb-4 rounded"
           placeholder="Name"
           onChange={(e)=>setName(e.target.value)}
         />
 
         <input
-          className="border p-2 w-full mb-3"
+          className="border p-2 w-full mb-4 rounded"
           placeholder="Email"
           onChange={(e)=>setEmail(e.target.value)}
         />
 
         <input
           type="password"
-          className="border p-2 w-full mb-3"
+          className="border p-2 w-full mb-4 rounded"
           placeholder="Password"
           onChange={(e)=>setPassword(e.target.value)}
         />
 
         <select
-          className="border p-2 w-full mb-3"
+          className="border p-2 w-full mb-4 rounded"
           onChange={(e)=>setRole(e.target.value)}
         >
 
           <option value="USER">User</option>
           <option value="MANAGER">Manager</option>
           <option value="ADMIN">Admin</option>
+          <option value="HR">HR</option>
 
         </select>
 
         <button
           onClick={register}
-          className="bg-green-500 text-white w-full p-2 rounded"
+          className="bg-green-500 hover:bg-green-600 text-white w-full p-2 rounded mb-4 transition"
         >
           Register
         </button>
 
+        <p className="text-center text-sm">
+
+          Already registered?{" "}
+
+          <span
+            onClick={() => navigate("/login")}
+            className="text-blue-600 font-semibold cursor-pointer hover:underline"
+          >
+            Login
+          </span>
+
+        </p>
+
       </div>
-
-      {showOtp && (
-
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-
-          <div className="bg-white p-6 rounded w-80">
-
-            <h3 className="text-lg font-bold mb-3">
-              Enter OTP
-            </h3>
-
-            <input
-              className="border p-2 w-full mb-3"
-              placeholder="OTP"
-              onChange={(e)=>setOtp(e.target.value)}
-            />
-
-            <button
-              onClick={verifyOtp}
-              className="bg-blue-500 text-white w-full p-2 rounded"
-            >
-              Verify OTP
-            </button>
-
-          </div>
-
-        </div>
-
-      )}
 
     </div>
   );

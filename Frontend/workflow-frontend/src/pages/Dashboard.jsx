@@ -4,35 +4,6 @@ import axios from "axios";
 
 const Dashboard = () => {
 
-
-const[name,setName] = useState("");
-const[role,setRole] = useState("");
-  useEffect(() => {
-
-    const fetchEmail = async () => {
-
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get(
-        "http://localhost:8080/auth/email",
-        {
-          headers:{
-            Authorization:`Bearer ${token}`
-          }
-        }
-      );
-
-    setName(res.data.name);
-    setRole(res.data.role);
-
-    };
-
-    fetchEmail();
-
-  },[]);
-
-
-
  
   return (
 

@@ -33,6 +33,8 @@ public class Step {
 
     @Column(columnDefinition = "json")
     private String metadata;
+    
+   
 
 
 }

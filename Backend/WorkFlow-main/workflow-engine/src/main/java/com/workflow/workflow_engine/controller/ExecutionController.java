@@ -5,6 +5,7 @@ import com.workflow.workflow_engine.service.ExecutionService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +16,7 @@ public class ExecutionController {
     private final ExecutionService executionService;
 
     // START WORKFLOW
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public Execution startExecution(@RequestBody Execution execution){
 
@@ -29,6 +31,7 @@ public class ExecutionController {
     }
 
     // APPROVE STEP
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping("/{executionId}/approve")
     public Execution approve(@PathVariable String executionId,
                              @RequestParam String approverId){
@@ -37,6 +40,7 @@ public class ExecutionController {
     }
 
     // REJECT STEP
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping("/{executionId}/reject")
     public Execution reject(@PathVariable String executionId,
                             @RequestParam String approverId){

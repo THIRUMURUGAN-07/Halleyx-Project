@@ -14,15 +14,12 @@ import java.util.List;
 public class StepService {
 	private final StepRepository stepRepository;
 
-    public Step addStep(String workflowId, CreateStepRequest request){
+    public Step addStep(String stepId, Step request){
 
-        Step step = Step.builder()
-                .workflowId(workflowId)
-                .name(request.getName())
-                .stepType(request.getStepType())
-                .stepOrder(request.getStepOrder())
-                .metadata(request.getMetadata())
-                .build();
+    	
+        Step step = stepRepository.findById(stepId).get();
+        
+        step.setWorkflowId(request.getWorkflowId());
 
         return stepRepository.save(step);
     }
@@ -30,4 +27,17 @@ public class StepService {
     public List<Step> getSteps(String workflowId){
         return stepRepository.findByWorkflowId(workflowId);
     }
+
+	public Step updateStepWorkflow(String id, Step step) {
+	    Step existing = stepRepository.findById(id).orElseThrow();
+
+	    existing.setWorkflowId(step.getWorkflowId());
+
+	    return stepRepository.save(existing);
+	}
+
+	public Step addStepBefore(Step step) {
+		// TODO Auto-generated method stub
+		return stepRepository.save(step);
+	}
 }

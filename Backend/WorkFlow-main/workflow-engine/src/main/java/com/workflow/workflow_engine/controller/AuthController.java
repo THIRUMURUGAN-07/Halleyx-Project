@@ -10,7 +10,7 @@ import com.workflow.workflow_engine.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
+
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody LoginRequest request) {
+    public NameRoleDto login(@RequestBody LoginRequest request) {
 
         User user = userRepository
                 .findByEmail(request.getEmail())
@@ -51,22 +51,13 @@ public class AuthController {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
-        if(!user.isVerified()) {
-        	return Map.of("Response", "User Not verified");
-        }
-
-        return Map.of("token", jwtUtil.generateToken(user.getEmail()));
+        
+        	String token = jwtUtil.generateToken(user.getEmail());
+        	String name = user.getName();
+        	String role = user.getRole();
+        	
+        	return new NameRoleDto(name,role,token);
+         
     }
     
-    @GetMapping("/email")
-    public NameRoleDto getEmail(@RequestHeader("Authorization") String authHeader){
-
-        String token = authHeader.substring(7);
-
-        String email =  jwtUtil.extractUsername(token);
-        
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        NameRoleDto nameRoleDto = new NameRoleDto(user.getName(),user.getRole());
-        return nameRoleDto;
-    }
 }
