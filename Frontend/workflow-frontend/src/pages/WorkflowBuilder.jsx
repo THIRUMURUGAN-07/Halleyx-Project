@@ -125,9 +125,9 @@ const WorkflowBuilder = () => {
         console.log("Creating rule for step:", realStepId);
 
         await axios.post(
-          `http://localhost:8080/steps/${realStepId}/rules`,
+          `http://localhost:8080/rules/${realStepId}/rule`,
           {
-            ruleCondition:rule.condition,
+            condition:rule.condition,
             nextStepId:stepIdMap[rule.nextStepTempId],
             priority:rule.priority
           },

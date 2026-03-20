@@ -4,49 +4,63 @@ import axios from "axios";
 
 const WorkflowList = () => {
 
-  const [workflows,setWorkflows] = useState([]);
-  const [name,setName] = useState("");
+  const [workflows, setWorkflows] = useState([]);
 
   const loadWorkflows = async () => {
 
     const token = localStorage.getItem("token");
 
-    const res = await axios.get(
-      "http://localhost:8080/workflows",
-      {
-        headers:{
-          Authorization:`Bearer ${token}`
-        }
-      }
-    );
+    try {
 
-    setWorkflows(res.data);
+      const res = await axios.get(
+        "http://localhost:8080/workflows",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      setWorkflows(res.data);
+
+    } catch (err) {
+      console.log("ERROR:", err);
+    }
   };
 
-  const createWorkflow = async () => {
+  const deleteWorkflow = async (id) => {
 
     const token = localStorage.getItem("token");
 
-    await axios.post(
-      "http://localhost:8080/workflows",
-      {name},
-      {
-        headers:{
-          Authorization:`Bearer ${token}`
+    try {
+
+      await axios.delete(
+        `http://localhost:8080/workflows/${id}`, // ✅ FIXED URL
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
+      );
+
+      alert("Deleted successfully");
+
+      loadWorkflows(); // ✅ reload after delete
+
+    } catch (err) {
+
+      console.log("DELETE ERROR:", err);
+
+      if (err.response?.status === 403) {
+        alert("Access Denied (Only ADMIN can delete)");
       }
-    );
 
-    setName("");
-
-    loadWorkflows();
+    }
   };
 
-  useEffect(()=>{
-
+  useEffect(() => {
     loadWorkflows();
-
-  },[]);
+  }, []);
 
   return (
 
@@ -56,31 +70,22 @@ const WorkflowList = () => {
         Workflows
       </h2>
 
-      <div className="mb-6">
-
-        <input
-          className="border p-2 mr-2"
-          placeholder="Workflow name"
-          value={name}
-          onChange={(e)=>setName(e.target.value)}
-        />
-
-        <button
-          onClick={createWorkflow}
-          className="bg-green-500 text-white px-4 py-2"
-        >
-          Create
-        </button>
-
-      </div>
-
       {workflows.map(w => (
 
         <div
           key={w.id}
-          className="bg-white p-4 rounded shadow mb-3"
+          className="bg-white p-4 rounded shadow mb-3 flex justify-between items-center"
         >
-          {w.name}
+
+          <span>{w.name}</span>
+
+          <button
+            onClick={() => deleteWorkflow(w.id)}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+          >
+            Delete
+          </button>
+
         </div>
 
       ))}

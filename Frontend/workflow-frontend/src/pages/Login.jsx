@@ -10,7 +10,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const login = async () => {
-
+      console.log("Connecting with backend....")
     const res = await axios.post(
       "http://localhost:8080/auth/login",
       {email,password}
@@ -19,6 +19,8 @@ const Login = () => {
     localStorage.setItem("token",res.data.token);
     localStorage.setItem("name",res.data.name);
     localStorage.setItem("role",res.data.role);
+    console.log("Connected successfully....");
+    console.log(`Redirecting to ${res.data.role} Dashboard....`);
 
     navigate("/dashboard");
   };

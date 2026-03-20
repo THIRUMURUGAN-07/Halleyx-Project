@@ -13,13 +13,16 @@ const Register = () => {
 
   const register = async () => {
 
-    await axios.post(
-      "http://localhost:8080/auth/register",
-      {name,email,password,role}
-    );
+  await axios.post(
+    "http://localhost:8080/auth/register",
+    { name, email, password, role }
+  );
 
-    alert("OTP sent to your email");
-  };
+  alert("OTP sent to your email");
+
+  // 👉 move to OTP page and pass email
+  navigate("/verify-otp", { state: { email } });
+};
 
   return (
 

@@ -9,6 +9,8 @@ import DashboardRouter from "./pages/DashboardRouter";
 import WorkflowBuilder from "./pages/WorkflowBuilder";
 import Executions from "./pages/Executions";
 import ExecutionLogs from "./pages/ExecutionLogs";
+import VerifyOtp from "./pages/VerifyOtp";
+
 
 function App() {
   return (
@@ -26,6 +28,9 @@ function App() {
 
         {/* Dashboard */}
         <Route path="/dashboard" element={<DashboardRouter />} />
+
+        {/* verify Otp */}
+        <Route path="/verify-otp" element={<VerifyOtp />} />
 
         {/* Workflows */}
         <Route
