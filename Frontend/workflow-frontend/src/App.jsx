@@ -10,6 +10,10 @@ import WorkflowBuilder from "./pages/WorkflowBuilder";
 import Executions from "./pages/Executions";
 import ExecutionLogs from "./pages/ExecutionLogs";
 import VerifyOtp from "./pages/VerifyOtp";
+import UserWorkflowExecute from "./pages/UserWorkflowExecute";
+import ApprovalPage from "./pages/ApprovalPage";
+import ApprovalHistory from "./pages/ApprovalHistory";
+import ViewExecution from "./pages/ViewExecution";
 
 
 function App() {
@@ -31,6 +35,16 @@ function App() {
 
         {/* verify Otp */}
         <Route path="/verify-otp" element={<VerifyOtp />} />
+
+        {/* approval page*/}
+        <Route path="/approval" element={<ApprovalPage />} />
+        {/* approval History page*/}
+        <Route path="/approval-history" element={ <ApprovalHistory/>} />
+
+        {/* view page*/}
+        <Route path="/view-executions" element={ <ViewExecution/>} />
+
+
 
         {/* Workflows */}
         <Route
@@ -65,6 +79,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/userworkflows" element={<UserWorkflowExecute />} />
       </Routes>
     </BrowserRouter>
   );

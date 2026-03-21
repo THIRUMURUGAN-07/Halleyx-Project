@@ -2,249 +2,175 @@ import { useState } from "react";
 import axios from "axios";
 import Layout from "../components/Layout";
 
+const WORKFLOWS = {
+  LEAVE: {
+    name: "Leave Approval",
+    steps: [
+      { name: "Apply Leave", type: "TASK" },
+      { name: "Manager Approval", type: "APPROVAL" },
+      { name: "HR Approval", type: "APPROVAL" }
+    ],
+    rules: [
+      { from: 0, to: 1, condition: "days <= 5" },
+      { from: 0, to: 2, condition: "days > 5" }
+    ]
+  },
+
+  LOAN: {
+    name: "Bank Loan Approval",
+    steps: [
+      { name: "Apply Loan", type: "TASK" },
+      { name: "Manager Review", type: "APPROVAL" },
+      { name: "Finance Approval", type: "APPROVAL" }
+    ],
+    rules: [
+      { from: 0, to: 1, condition: "amount < 50000" },
+      { from: 0, to: 2, condition: "amount >= 50000" }
+    ]
+  }
+};
+
 const WorkflowBuilder = () => {
 
   const token = localStorage.getItem("token");
 
-  const [workflowName,setWorkflowName] = useState("");
-  const [steps,setSteps] = useState([]);
+  const [selected, setSelected] = useState("");
+  const [config, setConfig] = useState(null);
 
-  
-  const addStep = () => {
-
-    setSteps([
-      ...steps,
-      {
-        tempId: Date.now().toString(),
-        name:"",
-        stepType:"TASK",
-        rules:[]
-      }
-    ]);
+  const handleChange = (value) => {
+    setSelected(value);
+    setConfig(WORKFLOWS[value]);
   };
 
-  const updateStep = (index,field,value) => {
+  const createWorkflow = async () => {
 
-    const updated = [...steps];
-    updated[index][field] = value;
-    setSteps(updated);
-  };
-
-  const addRule = (stepIndex) => {
-
-    const updated = [...steps];
-
-    updated[stepIndex].rules.push({
-      condition:"",
-      nextStepTempId:"",
-      priority:1
-    });
-
-    setSteps(updated);
-  };
-
-  const updateRule = (stepIndex,ruleIndex,field,value) => {
-
-    const updated = [...steps];
-    updated[stepIndex].rules[ruleIndex][field] = value;
-    setSteps(updated);
-  };
-
-  const saveWorkflow = async () => {
-
-  try {
-
-    console.log("START");
-
-    const stepIdMap = {};
-
-    // STEP 1
-    for(let step of steps){
-
-      console.log("Creating step:", step.name);
-
-      const stepRes = await axios.post(
-        "http://localhost:8080/steps",
-        {
-          name:step.name,
-          stepType:step.stepType
-        },
-        {
-          headers:{ Authorization:`Bearer ${token}` }
-        }
-      );
-
-      stepIdMap[step.tempId] = stepRes.data.id;
+    if (!config) {
+      alert("Select workflow");
+      return;
     }
 
-    console.log("Steps created");
+    try {
 
-    // STEP 2
-    const firstStepId = stepIdMap[steps[0].tempId];
+      const stepIdMap = {};
 
-    const workflowRes = await axios.post(
-      "http://localhost:8080/workflows",
-      {
-        name:workflowName,
-        version:1,
-        isActive:true,
-        startStepId:firstStepId
-      },
-      {
-        headers:{ Authorization:`Bearer ${token}` }
-      }
-    );
+      // CREATE STEPS
+      for (let i = 0; i < config.steps.length; i++) {
 
-    const workflowId = workflowRes.data.id;
+        const step = config.steps[i];
 
-    console.log("Workflow created");
-
-    // STEP 3
-    for(let step of steps){
-
-      const realStepId = stepIdMap[step.tempId];
-
-      await axios.post(
-        `http://localhost:8080/steps/${realStepId}/step`,
-        { workflowId },
-        {
-          headers:{ Authorization:`Bearer ${token}` }
-        }
-      );
-    }
-
-    console.log("Steps updated");
-
-    // STEP 4 (LIKELY ERROR HERE)
-    for(let step of steps){
-
-      const realStepId = stepIdMap[step.tempId];
-
-      for(let rule of step.rules){
-
-        console.log("Creating rule for step:", realStepId);
-
-        await axios.post(
-          `http://localhost:8080/rules/${realStepId}/rule`,
+        const res = await axios.post(
+          "http://localhost:8080/steps",
           {
-            condition:rule.condition,
-            nextStepId:stepIdMap[rule.nextStepTempId],
-            priority:rule.priority
+            name: step.name,
+            stepType: step.type,
+            stepOrder: i
           },
           {
-            headers:{ Authorization:`Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        stepIdMap[i] = res.data.id;
+      }
+
+      // CREATE WORKFLOW
+      const workflowRes = await axios.post(
+        "http://localhost:8080/workflows",
+        {
+          name: config.name,
+          version: 1,
+          isActive: true,
+          startStepId: stepIdMap[0]
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      const workflowId = workflowRes.data.id;
+
+      // ATTACH STEPS
+      for (let i = 0; i < config.steps.length; i++) {
+
+        await axios.post(
+          `http://localhost:8080/steps/${stepIdMap[i]}/step`,
+          { workflowId },
+          {
+            headers: { Authorization: `Bearer ${token}` }
           }
         );
       }
+
+      // CREATE RULES
+      for (let rule of config.rules) {
+
+        await axios.post(
+          `http://localhost:8080/rules/${stepIdMap[rule.from]}/rule`,
+          {
+            condition: rule.condition,
+            nextStepId: stepIdMap[rule.to],
+            priority: 1
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+      }
+
+      alert("Workflow Created Successfully");
+
+    } catch (err) {
+      console.log(err);
+      alert("Error");
     }
-
-    console.log("Rules created");
-
-    alert("Workflow Created Successfully");
-
-  } catch (error) {
-
-    console.error("ERROR:", error.response?.data || error.message);
-
-    alert("Error occurred: " + (error.response?.status || ""));
-
-  }
-
-};
+  };
 
   return (
 
     <Layout>
 
       <h2 className="text-2xl font-bold mb-6">
-        Workflow Builder
+        Create Workflow
       </h2>
 
-      <input
-        className="border p-2 mb-6 w-full"
-        placeholder="Workflow Name"
-        onChange={(e)=>setWorkflowName(e.target.value)}
-      />
+      {/*  ONLY DROPDOWN */}
+      <select
+        className="border p-2 w-full mb-4"
+        onChange={(e) => handleChange(e.target.value)}
+      >
+        <option value="">Select Workflow</option>
+        <option value="LEAVE">Leave Approval</option>
+        <option value="LOAN">Bank Loan Approval</option>
+      </select>
 
-      {steps.map((step,index)=>(
+      {/* PREVIEW */}
+      {config && (
+        <div className="bg-white p-4 shadow">
 
-        <div key={step.tempId} className="bg-white p-4 mb-4 shadow">
-
-          <input
-            className="border p-2 mb-2 w-full"
-            placeholder="Step Name"
-            onChange={(e)=>updateStep(index,"name",e.target.value)}
-          />
-
-          <select
-            className="border p-2 mb-3 w-full"
-            onChange={(e)=>updateStep(index,"stepType",e.target.value)}
-          >
-            <option value="TASK">TASK</option>
-            <option value="APPROVAL">APPROVAL</option>
-            <option value="NOTIFICATION">NOTIFICATION</option>
-          </select>
-
-          <h4 className="font-bold mb-2">Rules</h4>
-
-          {step.rules.map((rule,rIndex)=>(
-
-            <div key={rIndex} className="border p-3 mb-2">
-
-              <input
-                className="border p-2 mb-2 w-full"
-                placeholder="Condition"
-                onChange={(e)=>updateRule(index,rIndex,"condition",e.target.value)}
-              />
-
-
-              <select
-                className="border p-2 w-full"
-                onChange={(e)=>updateRule(index,rIndex,"nextStepTempId",e.target.value)}
-              >
-                <option value="">Select Next Step</option>
-
-                {steps.map(s => (
-                  <option key={s.tempId} value={s.tempId}>
-                    {s.name || "Unnamed Step"}
-                  </option>
-                ))}
-
-              </select>
-
-            </div>
-
+          <h3 className="font-bold mb-2">Steps</h3>
+          {config.steps.map((s, i) => (
+            <div key={i}>{s.name}</div>
           ))}
 
-          <button
-            onClick={()=>addRule(index)}
-            className="bg-green-500 text-white p-2 rounded"
-          >
-            Add Rule
-          </button>
+          <h3 className="font-bold mt-4 mb-2">Rules</h3>
+          {config.rules.map((r, i) => (
+            <div key={i}>
+              {config.steps[r.from].name} → {config.steps[r.to].name}
+            </div>
+          ))}
 
         </div>
-
-      ))}
-
-      <button
-        onClick={addStep}
-        className="bg-blue-500 text-white p-2 rounded mr-4"
-      >
-        Add Step
-      </button>
+      )}
 
       <button
-        onClick={saveWorkflow}
-        className="bg-purple-600 text-white p-2 rounded"
+        onClick={createWorkflow}
+        className="bg-blue-500 text-white p-2 rounded mt-4"
       >
-        Save Workflow
+        Create Workflow
       </button>
 
     </Layout>
-
   );
-
 };
 
 export default WorkflowBuilder;

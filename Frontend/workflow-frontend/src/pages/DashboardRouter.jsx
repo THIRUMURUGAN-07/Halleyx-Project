@@ -10,9 +10,10 @@ const DashboardRouter = () => {
     return <AdminDashboard/>
   }
 
-  if(role === "MANAGER"){
+  if(role === "MANAGER" || role === "HR" || role === "BANK_MANAGER" || role === "BANK_ASSISTANT_MANAGER"){
     return <ManagerDashboard/>
   }
+ 
 
   return <UserDashboard/>
 }

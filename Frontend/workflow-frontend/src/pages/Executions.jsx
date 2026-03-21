@@ -11,14 +11,14 @@ const Executions = () => {
     const token = localStorage.getItem("token");
 
     const res = await axios.get(
-      "http://localhost:8080/executions",
+      "http://localhost:8080/executions/myexecution",
       {
         headers:{
           Authorization:`Bearer ${token}`
         }
       }
     );
-
+    console.log(res.data);
     setExecutions(res.data);
   };
 
@@ -40,9 +40,9 @@ const Executions = () => {
 
           <div key={e.id} className="bg-white p-4 shadow rounded">
 
-            <p><b>Workflow:</b> {e.workflowId}</p>
-            <p><b>Status:</b> {e.status}</p>
-            <p><b>Current Step:</b> {e.currentStepId}</p>
+            <p><b>Workflow Name:</b> {e.workflow.name}</p>
+            <p><b>Status:</b> {e.execution.status}</p>
+            <p><b>Current Step:</b> {e.execution.currentStepId == null? 0 : e.execution.currentStepId}</p>
 
           </div>
 

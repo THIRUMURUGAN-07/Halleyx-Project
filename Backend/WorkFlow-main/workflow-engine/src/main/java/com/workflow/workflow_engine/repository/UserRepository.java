@@ -9,5 +9,7 @@ import com.workflow.workflow_engine.entity.User;
 public interface UserRepository extends JpaRepository<User,String> {
 
     Optional<User> findByEmail(String email);
+    
+    User findByRole(String role);
 
 }

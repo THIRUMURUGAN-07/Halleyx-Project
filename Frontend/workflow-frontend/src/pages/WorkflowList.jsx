@@ -35,7 +35,7 @@ const WorkflowList = () => {
     try {
 
       await axios.delete(
-        `http://localhost:8080/workflows/${id}`, // ✅ FIXED URL
+        `http://localhost:8080/workflows/${id}`, // FIXED URL
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -45,7 +45,7 @@ const WorkflowList = () => {
 
       alert("Deleted successfully");
 
-      loadWorkflows(); // ✅ reload after delete
+      loadWorkflows(); //  reload after delete
 
     } catch (err) {
 

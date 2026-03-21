@@ -26,7 +26,6 @@ public class User {
 
     private String role;
 
-    private String managerId;
     private boolean verified;
 
     private String otp;

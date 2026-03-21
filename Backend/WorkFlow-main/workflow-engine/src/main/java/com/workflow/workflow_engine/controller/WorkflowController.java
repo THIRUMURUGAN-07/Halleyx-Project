@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ADMIN','USER')")
 @RequestMapping("/workflows")
 @RequiredArgsConstructor
 public class WorkflowController {

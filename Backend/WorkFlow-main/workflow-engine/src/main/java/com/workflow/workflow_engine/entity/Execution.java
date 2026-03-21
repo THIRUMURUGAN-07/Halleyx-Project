@@ -20,4 +20,6 @@ public class Execution {
 
     @Column(columnDefinition = "json")
     private String data;
+    
+    private String userId;
 }

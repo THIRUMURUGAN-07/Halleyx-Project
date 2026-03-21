@@ -8,10 +8,11 @@ import com.workflow.workflow_engine.repository.UserRepository;
 import com.workflow.workflow_engine.security.JwtUtil;
 import com.workflow.workflow_engine.service.AuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
-
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,44 +21,55 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
-    private final AuthService authService;
-    private final PasswordEncoder passwordEncoder;
+	private final UserRepository userRepository;
+	private final JwtUtil jwtUtil;
+	private final AuthService authService;
+	private final PasswordEncoder passwordEncoder;
 
-    @PostMapping("/register")
-    public String register(@RequestBody User user){
+	@PostMapping("/register")
+	public String register(@RequestBody User user) {
 
-        return authService.sendOtp(user);
-    }
+		return authService.sendOtp(user);
+	}
 
-    @PostMapping("/verify-otp")
-    public User verifyOtp(@RequestBody OtpVerifyDto otp){
-    	
-    	String email = otp.getEmail();
-    	
-    	String otp1 = otp.getOtp();
+	@PostMapping("/verify-otp")
+	public User verifyOtp(@RequestBody OtpVerifyDto otp) {
 
-        return authService.verifyOtp(email,otp1);
-    }
+		String email = otp.getEmail();
 
-    @PostMapping("/login")
-    public NameRoleDto login(@RequestBody LoginRequest request) {
+		String otp1 = otp.getOtp();
 
-        User user = userRepository
-                .findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+		return authService.verifyOtp(email, otp1);
+	}
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
-        }
-        
-        	String token = jwtUtil.generateToken(user.getEmail());
-        	String name = user.getName();
-        	String role = user.getRole();
-        	
-        	return new NameRoleDto(name,role,token);
-         
-    }
+	@PostMapping("/login")
+	public NameRoleDto login(@RequestBody LoginRequest request) {
+
+		User user = userRepository.findByEmail(request.getEmail())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+			throw new RuntimeException("Invalid password");
+		}
+
+		String token = jwtUtil.generateToken(user.getEmail());
+		String name = user.getName();
+		String role = user.getRole();
+
+		return new NameRoleDto(name, role, token);
+
+	}
+
+	@GetMapping("/get-userId")
+    public String getEmail(HttpServletRequest request) {
+
+  String email = authService.getEmail(request);
+  
+  User user = userRepository.findByEmail(email).get();
+  
+  return user.getId();  
     
+
+}
+
 }

@@ -18,14 +18,14 @@ const AdminDashboard = () => {
         <Link to="/workflowbuilder" className="bg-white p-6 shadow rounded">
           Create Workflow
         </Link>
+        <Link to="/workflows" className="bg-white p-6 shadow rounded">
+          view Workflow
+        </Link>
 
-        <Link to="/executions" className="bg-white p-6 shadow rounded">
+        <Link to="/view-executions" className="bg-white p-6 shadow rounded">
           View Executions
         </Link>
 
-        <Link to="/logs" className="bg-white p-6 shadow rounded">
-          Execution Logs
-        </Link>
 
       </div>
 

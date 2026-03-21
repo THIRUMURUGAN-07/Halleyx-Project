@@ -1,11 +1,15 @@
 package com.workflow.workflow_engine.controller;
 
+import com.workflow.workflow_engine.dto.MyExecutionDto;
 import com.workflow.workflow_engine.entity.Execution;
 import com.workflow.workflow_engine.service.ExecutionService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,11 +20,27 @@ public class ExecutionController {
     private final ExecutionService executionService;
 
     // START WORKFLOW
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('USER')")
     @PostMapping
     public Execution startExecution(@RequestBody Execution execution){
+    	String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
 
-        return executionService.startExecution(execution);
+        return executionService.startExecution(execution, email);
+
+
+    }
+    
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/myexecution")
+    public List<MyExecutionDto> getUserExecution(){
+    	String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+    	return executionService.getUserExecution(email);
     }
 
     // MOVE TO NEXT STEP

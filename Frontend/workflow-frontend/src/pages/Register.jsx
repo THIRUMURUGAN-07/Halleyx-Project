@@ -20,7 +20,7 @@ const Register = () => {
 
   alert("OTP sent to your email");
 
-  // 👉 move to OTP page and pass email
+  //  move to OTP page and pass email
   navigate("/verify-otp", { state: { email } });
 };
 
@@ -60,8 +60,9 @@ const Register = () => {
 
           <option value="USER">User</option>
           <option value="MANAGER">Manager</option>
-          <option value="ADMIN">Admin</option>
           <option value="HR">HR</option>
+          <option value="BANK_MANAGER">Bank Manager</option>
+          <option value="BANK_ASSISTANT_MANAGER">Bank Assistant Manager</option>
 
         </select>
 

@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 
 import com.workflow.workflow_engine.entity.User;
 import com.workflow.workflow_engine.repository.UserRepository;
+import com.workflow.workflow_engine.security.JwtUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -13,6 +15,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public User register(User user){
 
@@ -54,5 +57,21 @@ public class AuthService {
 
         return user;
     }
+    
+    public String getEmail(HttpServletRequest request) {
 
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+
+            String token = authHeader.substring(7);
+
+            String email = jwtUtil.extractEmail(token);
+
+            return email;
+        }
+
+        return "Invalid token";
+
+}
 }
