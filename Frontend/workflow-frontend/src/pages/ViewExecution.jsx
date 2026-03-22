@@ -6,17 +6,15 @@ const ViewExecution = () => {
   const executions = [
     {
       id: 1,
-      userName: "Thiru",
+      userName: "THIRU",
       workflowName: "Leave Approval",
-      status: "In Progress",
-      startedTime: "2026-03-21 10:30 AM"
+      status: "Completed",
     },
     {
       id: 2,
-      userName: "Murugan",
+      userName: "THIRU",
       workflowName: "Leave Approval",
       status: "Completed",
-      startedTime: "2026-03-20 02:15 PM"
     }
   ];
 
@@ -35,7 +33,7 @@ const ViewExecution = () => {
             <th className="p-3">User Name</th>
             <th className="p-3">Workflow</th>
             <th className="p-3">Status</th>
-            <th className="p-3">Started Time</th>
+            
           </tr>
         </thead>
 

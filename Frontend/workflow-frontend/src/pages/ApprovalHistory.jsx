@@ -8,13 +8,13 @@ const ApprovalHistory = () => {
       id: 1,
       name: "Leave Approval",
       status: "Approved",
-      userName: "Thiru"
+      userName: "THIRU"
     },
     {
       id: 2,
       name: "Leave Approval",
       status: "Rejected",
-      userName: "Murugan"
+      userName: "THIRU"
     }
   ];
 
